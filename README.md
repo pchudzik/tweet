@@ -1,4 +1,4 @@
-# tweet
+# tweet [![Build Status](https://travis-ci.org/pchudzik/tweet.svg?branch=master)](https://travis-ci.org/pchudzik/tweet)
 
 Something like a tweeter clone to bootstrap learning process of database and REST tools in python
 
