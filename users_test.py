@@ -13,6 +13,17 @@ def test_create_user(session_mock):
             password="password"))
 
 
+def test_find_user():
+    with mock.patch('db.find_user') as find_user:
+        find_user.side_effect = [users.User(1, "name", "password")]
+
+        found = users.find_user("user login")
+
+        assert found.id == 1
+        assert found.name == "name"
+        assert found.password == "password"
+
+
 @pytest.fixture()
 def session_mock():
     return mock.Mock()
