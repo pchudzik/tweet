@@ -8,6 +8,10 @@ dbmate_version = v1.4.1
 install:
 	pipenv install
 
+run:
+	make run-test-db
+	pipenv run python api.py && make stop-test-db
+
 test:
 	export ENV=$(ENV)
 	make run-test-db
