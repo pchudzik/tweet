@@ -5,6 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from api import app
 from users import User
+from tweets import Tweet
 
 
 @mock.patch("users.create_user")
@@ -36,6 +37,23 @@ def test_find_user(find_user, client):
         "id": 123,
         "name": "name",
         "password": "secret"
+    }
+
+
+@mock.patch("tweets.create_tweet")
+def test_tweet(create_tweet, client):
+    login = "john"
+    content = "content"
+    create_tweet.return_value = Tweet(123, login, content)
+
+    response = client \
+        .post(f"/users/{login}/tweets", json={"content": content}) \
+        .get_json()
+
+    assert response == {
+        "id": 123,
+        "user": login,
+        "content": content
     }
 
 

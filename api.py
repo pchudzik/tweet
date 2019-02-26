@@ -3,6 +3,7 @@ from collections import namedtuple
 from sqlalchemy.orm.exc import NoResultFound
 
 import users
+import tweets
 
 app = Flask(__name__)
 app.debug = True
@@ -21,6 +22,13 @@ def add_user():
 def list_users():
     login = request.args["name"]
     return jsonify(users.find_user(login)._asdict())
+
+
+@app.route("/users/<login>/tweets", methods=["POST"])
+def create_tweet(login):
+    payload = request.get_json()
+    tweet = tweets.create_tweet(login, payload.get("content"))
+    return jsonify(tweet._asdict())
 
 
 @app.errorhandler(NoResultFound)
