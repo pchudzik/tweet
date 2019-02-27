@@ -1,5 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, func
+import datetime
+from sqlalchemy.types import DateTime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, relationship, scoped_session
 from contextlib import contextmanager
@@ -50,10 +52,12 @@ class Tweet(Base):
     content = Column(String(256))
     user_id = Column("user_id", Integer, ForeignKey("users.id"))
     user = relationship("User")
+    post_time = Column("post_time", DateTime, nullable=False)
 
-    def __init__(self, *, user, content):
+    def __init__(self, *, user, content, now=None):
         self.user = user
         self.content = content
+        self.post_time = datetime.datetime.utcnow() if now is None else now
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id},user={self.user_id},content={self.content})"

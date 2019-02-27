@@ -15,7 +15,7 @@ run:
 test:
 	export ENV=$(ENV)
 	make run-test-db
-	pipenv run pytest -v
+	pipenv run pytest -v -W ignore::DeprecationWarning -W ignore::UserWarning
 	make stop-test-db
 
 run-test-db:
