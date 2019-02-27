@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # wait-for-postgres.sh
 
 set -e
@@ -8,9 +8,10 @@ user="$2"
 password="$3"
 version="$4"
 
-until docker run --link "$host" --rm -e PGPASSWORD="$password" postgres:"$version" psql -h "$host" -U "$user" -c '\q'; do
-  >&2 echo "Postgres is unavailable - sleeping"
+echo -n "Postgres is unavailable - sleeping"
+until docker exec -e PGPASSWORD="$password" "$host" psql -h "localhost" -U "$user" -c '\q' > /dev/null 2>&1; do
+  echo -n "."
   sleep 0.2
 done
 
->&2 echo "Postgres is up!"
+echo "Postgres is up!"
