@@ -30,7 +30,7 @@ def test_find_user(find_user, client):
     find_user.return_value = User(123, "name", "secret")
 
     response = client \
-        .get("/users?name=name") \
+        .get("/users/name") \
         .get_json()
 
     assert response == {
@@ -41,7 +41,7 @@ def test_find_user(find_user, client):
 
 
 @mock.patch("tweets.create_tweet")
-def test_tweet(create_tweet, client):
+def test_create_tweet(create_tweet, client):
     login = "john"
     content = "content"
     create_tweet.return_value = Tweet(123, login, content)
@@ -57,11 +57,34 @@ def test_tweet(create_tweet, client):
     }
 
 
+@mock.patch("tweets.find_tweets")
+def test_find_tweet(find_tweets, client):
+    login = "john"
+    content = "content"
+    find_tweets.return_value = [
+        Tweet(123, login, content + "1"),
+        Tweet(321, login, content + "2")]
+
+    response = client \
+        .get(f"/users/{login}/tweets") \
+        .get_json()
+
+    assert response == [{
+        "id": 123,
+        "user": login,
+        "content": content + "1"
+    }, {
+        "id": 321,
+        "user": login,
+        "content": content + "2"
+    }]
+
+
 @mock.patch("users.find_user")
 def test_NoResultFound_error_handler(find_user, client):
     find_user.side_effect = NoResultFound()
 
-    response = client.get("/users?name=non_existing")
+    response = client.get("/users/non_existing")
 
     print(response)
     assert response.status_code == 404

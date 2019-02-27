@@ -18,9 +18,8 @@ def add_user():
     return jsonify(user._asdict())
 
 
-@app.route("/users", methods=["GET"])
-def list_users():
-    login = request.args["name"]
+@app.route("/users/<login>", methods=["GET"])
+def list_users(login):
     return jsonify(users.find_user(login)._asdict())
 
 
@@ -29,6 +28,12 @@ def create_tweet(login):
     payload = request.get_json()
     tweet = tweets.create_tweet(login, payload.get("content"))
     return jsonify(tweet._asdict())
+
+
+@app.route("/users/<login>/tweets", methods=["GET"])
+def find_all_tweets(login):
+    all_tweets = tweets.find_tweets(login)
+    return jsonify(list(map(lambda t: t._asdict(), all_tweets)))
 
 
 @app.errorhandler(NoResultFound)
