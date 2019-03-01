@@ -11,6 +11,8 @@ psycopg2 = "*"
 pytest = "*"
 alembic = "*"
 flask = "*"
+flask-sqlalchemy = "*"
+flask-testing = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,11 +1,10 @@
-import pytest
 from unittest import mock
 from src import users
 from src.FiledMatcher import FieldMatcher
 
 
-def test_create_user(session_mock):
-    with mock.patch('src.db.Session', return_value=session_mock):
+def test_create_user():
+    with mock.patch('src.infrastructure.db.session') as session_mock:
         users.create_user("name", "password")
 
         session_mock.add.assert_called_with(FieldMatcher(
@@ -22,8 +21,3 @@ def test_find_user():
         assert found.id == 1
         assert found.name == "name"
         assert found.password == "password"
-
-
-@pytest.fixture()
-def session_mock():
-    return mock.Mock()

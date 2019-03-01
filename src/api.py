@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request
 from collections import namedtuple
 from sqlalchemy.orm.exc import NoResultFound
-
+from src.infrastructure import init_extensions
 from src import users, tweets
+from src.config import configuration
 
 app = Flask(__name__)
-app.debug = True
-
+app.config["SQLALCHEMY_DATABASE_URI"] = configuration.get("database", "url")
+init_extensions(app)
 Message = namedtuple("Message", "from_, message")
 
 
@@ -38,7 +39,3 @@ def find_all_tweets(login):
 @app.errorhandler(NoResultFound)
 def no_result_found_handler(error):
     return jsonify(message="not found", err=str(error)), 404
-
-
-if __name__ == "__main__":
-    app.run()

@@ -10,7 +10,7 @@ install:
 
 run:
 	make run-test-db
-	pipenv run python api.py && make stop-test-db
+	ENV=$(ENV) pipenv run python app.py && make stop-test-db
 
 test:
 	export ENV=$(ENV)

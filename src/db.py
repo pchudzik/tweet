@@ -1,33 +1,12 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey
 import datetime
 from sqlalchemy.types import DateTime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, relationship, scoped_session
-from contextlib import contextmanager
+from sqlalchemy.orm import relationship
 
-from src.config import configuration
-
-engine = create_engine(configuration.get("database", "url"), echo=True)
-
-Base = declarative_base()
-Session = scoped_session(sessionmaker(bind=engine))
+from src.infrastructure import db
 
 
-@contextmanager
-def session_creator(commit=lambda s: s.commit()):
-    session = Session()
-    try:
-        yield session
-        commit(session)
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
-
-
-class User(Base):
+class User(db.Model):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
@@ -45,7 +24,7 @@ class User(Base):
         return f"{self.__class__.name}(id={self.id},name={self.name})"
 
 
-class Tweet(Base):
+class Tweet(db.Model):
     __tablename__ = "tweets"
 
     id = Column(Integer, primary_key=True)
@@ -63,7 +42,7 @@ class Tweet(Base):
         return f"{self.__class__.__name__}(id={self.id},user={self.user_id},content={self.content})"
 
 
-class Follower(Base):
+class Follower(db.Model):
     __tablename__ = "followers"
 
     id = Column("id", Integer, primary_key=True)
@@ -79,23 +58,23 @@ class Follower(Base):
         self.follower = follower
 
 
-def find_user(session, login):
-    return session.query(User).filter(User.name == login).one()
+def find_user(login):
+    return db.session.query(User).filter(User.name == login).one()
 
 
-def find_tweets(session, login):
-    return session \
+def find_tweets(login):
+    return db.session \
         .query(Tweet) \
         .join(User, User.id == Tweet.user_id) \
         .filter(User.name == login) \
         .all()
 
 
-def find_followers(session, login):
-    followers_q = session \
+def find_followers(login):
+    followers_q = db.session \
         .query(Follower.follower_id) \
         .join(Follower.user) \
         .filter(User.name == login) \
         .subquery()
 
-    return session.query(User).filter(User.id.in_(followers_q)).all()
+    return db.session.query(User).filter(User.id.in_(followers_q)).all()
