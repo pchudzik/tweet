@@ -1,12 +1,12 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, func
+from sqlalchemy import Column, Integer, String, ForeignKey
 import datetime
 from sqlalchemy.types import DateTime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, relationship, scoped_session
 from contextlib import contextmanager
 
-from config import configuration
+from src.config import configuration
 
 engine = create_engine(configuration.get("database", "url"), echo=True)
 

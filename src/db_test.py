@@ -1,9 +1,9 @@
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from db import session_creator
-from db import User, Tweet, Follower
-from db import find_user, find_tweets, find_followers
+from src.db import session_creator
+from src.db import User, Tweet, Follower
+from src.db import find_user, find_tweets, find_followers
 
 
 @pytest.fixture()

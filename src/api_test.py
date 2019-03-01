@@ -3,12 +3,12 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from api import app
-from users import User
-from tweets import Tweet
+from src.api import app
+from src.users import User
+from src.tweets import Tweet
 
 
-@mock.patch("users.create_user")
+@mock.patch("src.users.create_user")
 def test_create_user(create_user, client):
     create_user.return_value = User(123, "created", "secret")
 
@@ -25,7 +25,7 @@ def test_create_user(create_user, client):
     create_user.assert_called_once_with("name", "password")
 
 
-@mock.patch("users.find_user")
+@mock.patch("src.users.find_user")
 def test_find_user(find_user, client):
     find_user.return_value = User(123, "name", "secret")
 
@@ -40,7 +40,7 @@ def test_find_user(find_user, client):
     }
 
 
-@mock.patch("tweets.create_tweet")
+@mock.patch("src.tweets.create_tweet")
 def test_create_tweet(create_tweet, client):
     login = "john"
     content = "content"
@@ -57,7 +57,7 @@ def test_create_tweet(create_tweet, client):
     }
 
 
-@mock.patch("tweets.find_tweets")
+@mock.patch("src.tweets.find_tweets")
 def test_find_tweet(find_tweets, client):
     login = "john"
     content = "content"
@@ -80,7 +80,7 @@ def test_find_tweet(find_tweets, client):
     }]
 
 
-@mock.patch("users.find_user")
+@mock.patch("src.users.find_user")
 def test_NoResultFound_error_handler(find_user, client):
     find_user.side_effect = NoResultFound()
 

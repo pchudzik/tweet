@@ -1,5 +1,5 @@
 from collections import namedtuple
-import db
+from src import db
 
 User = namedtuple("User", "id, name, password")
 

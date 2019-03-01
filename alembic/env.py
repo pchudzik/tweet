@@ -10,8 +10,8 @@ from alembic import context
 import os, sys
 sys.path.append(os.getcwd())
 
-from db import Base
-from config import configuration as app_cfg
+from src.db import Base
+from src.config import configuration as app_cfg
 
 
 # this is the Alembic Config object, which provides

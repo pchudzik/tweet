@@ -2,8 +2,7 @@ from flask import Flask, jsonify, request
 from collections import namedtuple
 from sqlalchemy.orm.exc import NoResultFound
 
-import users
-import tweets
+from src import users, tweets
 
 app = Flask(__name__)
 app.debug = True
