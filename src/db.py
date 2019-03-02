@@ -58,20 +58,20 @@ class Follower(db.Model):
         self.follower = follower
 
 
-def find_user(login):
-    return db.session.query(User).filter(User.name == login).one()
+def find_user(session, login):
+    return session.query(User).filter(User.name == login).one()
 
 
-def find_tweets(login):
-    return db.session \
+def find_tweets(session, login):
+    return session \
         .query(Tweet) \
         .join(User, User.id == Tweet.user_id) \
         .filter(User.name == login) \
         .all()
 
 
-def find_followers(login):
-    followers_q = db.session \
+def find_followers(session, login):
+    followers_q = session \
         .query(Follower.follower_id) \
         .join(Follower.user) \
         .filter(User.name == login) \

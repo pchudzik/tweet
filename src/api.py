@@ -7,6 +7,7 @@ from src.config import configuration
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = configuration.get("database", "url")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = configuration.get("database", "tack_modifications")
 init_extensions(app)
 Message = namedtuple("Message", "from_, message")
 
