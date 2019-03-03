@@ -13,7 +13,8 @@ class User(db.Model):
     name = Column(String(50), unique=True)
     password = Column(String(64))
 
-    def __init__(self, name, password):
+    def __init__(self, name, password, id_value=None):
+        self.id = id_value
         self.name = name
         self.password = password
 

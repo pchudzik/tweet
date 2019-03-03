@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 from src.api import app
-from src.users import User
+from src.users import User, Follower
 from src.tweets import Tweet
 
 
@@ -80,13 +80,30 @@ def test_find_tweet(find_tweets, client):
     }]
 
 
+@mock.patch("src.api.users.follow")
+def test_follow(follow, client):
+    john_user = User(1, "john", "secret1")
+    adam_user = User(2, "adam", "secret2")
+    follow.return_value = Follower(1, john_user.id, adam_user.id)
+
+    response = client \
+        .patch(f"/users/{john_user.name}/followers",
+               json={"user": john_user.name, "follower": adam_user.name}) \
+        .get_json()
+
+    assert response == {
+        "id": 1,
+        "user": 1,
+        "follower": 2
+    }
+
+
 @mock.patch("src.users.find_user")
 def test_NoResultFound_error_handler(find_user, client):
     find_user.side_effect = NoResultFound()
 
     response = client.get("/users/non_existing")
 
-    print(response)
     assert response.status_code == 404
     assert response.get_json() == {
         "message": "not found",

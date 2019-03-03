@@ -37,6 +37,14 @@ def find_all_tweets(login):
     return jsonify(list(map(lambda t: t._asdict(), all_tweets)))
 
 
+@app.route("/users/<login>/followers", methods=["PATCH"])
+def add_follower(login):
+    payload = request.get_json()
+    follower = payload.get("follower")
+    user = payload.get("user")
+    return jsonify(users.follow(follower, user)._asdict())
+
+
 @app.errorhandler(NoResultFound)
 def no_result_found_handler(error):
     return jsonify(message="not found", err=str(error)), 404
