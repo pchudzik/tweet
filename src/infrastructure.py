@@ -1,7 +1,9 @@
 from contextlib import contextmanager
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 
+jwt = JWTManager()
 db = SQLAlchemy()
 
 
@@ -20,3 +22,4 @@ def session(commit=lambda s: s.commit()):
 
 def init_extensions(app):
     db.init_app(app)
+    jwt.init_app(app)

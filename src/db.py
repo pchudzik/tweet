@@ -59,6 +59,12 @@ class Follower(db.Model):
         self.follower = follower
 
 
+def login(session, login, password):
+    return session.query(User) \
+        .filter(User.name == login and User.password == password) \
+        .one_or_none()
+
+
 def find_user(session, login):
     return session.query(User).filter(User.name == login).one()
 

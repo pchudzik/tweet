@@ -49,6 +49,20 @@ def test_follow(sql_session_mock, session_mock):
         ))
 
 
+@mock.patch("src.users.sql_session")
+@mock.patch("src.users.create_access_token")
+def test_login_user(access_token_mock, sql_session_mock, session_mock):
+    sql_session_mock.return_value.__enter__.return_value = session_mock
+    with mock.patch("src.users.db.login") as login_user:
+        login_user.return_value = db.User("john", "secret", id_value=1)
+        access_token_mock.return_value = "secret_token"
+
+        credentials = users.login("login", "password")
+
+        assert credentials.token == "secret_token"
+        access_token_mock.assert_called_with("john")
+
+
 @pytest.fixture()
 def session_mock():
     return mock.Mock()

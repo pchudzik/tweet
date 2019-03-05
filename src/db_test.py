@@ -3,10 +3,10 @@ from flask_testing import TestCase
 from flask import Flask
 from sqlalchemy.orm.exc import NoResultFound
 from src.config import configuration
-from src.infrastructure import db, init_extensions, session as sql_session
+from src.infrastructure import init_extensions, session as sql_session
 
 from src.db import User, Tweet, Follower
-from src.db import find_user, find_tweets, find_followers
+from src.db import find_user, find_tweets, find_followers, login
 
 
 class DbTest(TestCase):
@@ -76,6 +76,17 @@ class DbTest(TestCase):
             assert len(find_followers(session, mark.name)) == 0
             assert set(find_followers(session, adam.name)) == {john, mark}
             assert set(find_followers(session, john.name)) == {adam}
+
+    def test_login_user(self):
+        with session_for_test() as session:
+            john = create_entity(session, User("john", "secret"))
+            session.flush()
+
+            assert login(session, "john", "secret").id == john.id
+
+    def test_login_invalid_user(self):
+        with session_for_test() as session:
+            assert login(session, "any_login", "invalid_password") is None
 
 
 def session_for_test():

@@ -1,10 +1,12 @@
 from collections import namedtuple
 from src import db
 from src.infrastructure import session as sql_session
+from flask_jwt_extended import create_access_token
 
 User = namedtuple("User", "id, name, password")
 User.from_ = lambda db_user: User(db_user.id, db_user.name, db_user.password)
 Follower = namedtuple("Follower", "id, user, follower")
+Credentials = namedtuple("Credentials", "token")
 
 
 def create_user(name, password):
@@ -32,3 +34,11 @@ def find_user(login):
     with sql_session() as session:
         user = db.find_user(session, login)
         return User(user.id, user.name, user.password)
+
+
+def login(login, password):
+    with sql_session() as session:
+        user = db.login(session, login, password)
+
+        if user:
+            return Credentials(create_access_token(user.name))

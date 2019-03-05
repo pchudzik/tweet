@@ -4,10 +4,12 @@ from sqlalchemy.orm.exc import NoResultFound
 from src.infrastructure import init_extensions
 from src import users, tweets
 from src.config import configuration
+from flask_jwt_extended import jwt_required
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = configuration.get("database", "url")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = configuration.get("database", "tack_modifications")
+app.config['JWT_SECRET_KEY'] = 'secret123'
 init_extensions(app)
 Message = namedtuple("Message", "from_, message")
 
@@ -22,6 +24,22 @@ def add_user():
 @app.route("/users/<login>", methods=["GET"])
 def list_users(login):
     return jsonify(users.find_user(login)._asdict())
+
+
+@app.route("/login", methods=["POST"])
+def login_user():
+    payload = request.get_json()
+    login_state = users.login(payload.get("login"), payload.get("password"))
+    if login_state:
+        return jsonify(login_state._asdict())
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
+
+
+@app.route("/secured")
+@jwt_required
+def secured_api():
+    return jsonify({"message": 42}), 200
 
 
 @app.route("/users/<login>/tweets", methods=["POST"])

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 from src.api import app
-from src.users import User, Follower
+from src.users import User, Follower, Credentials
 from src.tweets import Tweet
 
 
@@ -95,6 +95,33 @@ def test_follow(follow, client):
         "id": 1,
         "user": 1,
         "follower": 2
+    }
+
+
+@mock.patch("src.api.users.login")
+def test_login(login_mock, client):
+    login_mock.return_value = Credentials("secret_token")
+
+    response = client \
+        .post("/login", json={"login": "john", "password": "secret"}) \
+        .get_json()
+
+    login_mock.assert_called_with("john", "secret")
+    assert response == {
+        "token": "secret_token"
+    }
+
+
+@mock.patch("src.api.users.login")
+def test_invalid_login(login_mock, client):
+    login_mock.return_value = None
+
+    response = client \
+        .post("/login", json={"login": "john", "password": "secret"})
+
+    assert response.status_code == 401
+    assert response.get_json() == {
+        "message": "Invalid credentials"
     }
 
 
