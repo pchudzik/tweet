@@ -5,8 +5,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from src.config import configuration
 from src.infrastructure import init_extensions, session as sql_session
 
-from src.db import User, Tweet, Follower
-from src.db import find_user, find_tweets, find_followers, login
+from src.db import User, Tweet, Follower, Token
+from src.db import find_user, find_tweets, find_followers, login, is_token_revoked
 
 
 class DbTest(TestCase):
@@ -87,6 +87,14 @@ class DbTest(TestCase):
     def test_login_invalid_user(self):
         with session_for_test() as session:
             assert login(session, "any_login", "invalid_password") is None
+
+    def test_detects_revoked_token(self):
+        with session_for_test() as session:
+            revoked_token = "revoked"
+            create_entity(session, Token(revoked_token))
+
+            assert is_token_revoked(session, "revoked")
+            assert not is_token_revoked(session, "some other token")
 
 
 def session_for_test():

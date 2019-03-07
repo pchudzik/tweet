@@ -59,6 +59,22 @@ class Follower(db.Model):
         self.follower = follower
 
 
+class Token(db.Model):
+    __tablename__ = "jwt_revoked_tokens"
+
+    id = db.Column("id", db.Integer, primary_key=True)
+    jti = db.Column("jti", db.String(120))
+
+    def __init__(self, jti):
+        self.jti = jti
+
+
+def is_token_revoked(session, jti):
+    return bool(session.query(Token)
+                .filter(Token.jti == jti)
+                .first())
+
+
 def login(session, login, password):
     return session.query(User) \
         .filter(User.name == login and User.password == password) \

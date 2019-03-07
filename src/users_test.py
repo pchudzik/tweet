@@ -2,6 +2,7 @@ from unittest import mock
 import pytest
 import src.db as db
 from src import users
+from src.tokens import Credentials
 from src.FiledMatcher import FieldMatcher
 
 
@@ -50,17 +51,21 @@ def test_follow(sql_session_mock, session_mock):
 
 
 @mock.patch("src.users.sql_session")
-@mock.patch("src.users.create_access_token")
-def test_login_user(access_token_mock, sql_session_mock, session_mock):
+@mock.patch("src.users.tokens")
+def test_login_user(token_mock, sql_session_mock, session_mock):
     sql_session_mock.return_value.__enter__.return_value = session_mock
     with mock.patch("src.users.db.login") as login_user:
-        login_user.return_value = db.User("john", "secret", id_value=1)
-        access_token_mock.return_value = "secret_token"
+        user = db.User("john", "secret", id_value=1)
+        login_user.return_value = user
+        token_mock.refresh_token.return_value = Credentials(
+            "secret_token",
+            "refresh_token")
 
         credentials = users.login("login", "password")
 
         assert credentials.token == "secret_token"
-        access_token_mock.assert_called_with("john")
+        assert credentials.refresh_token == "refresh_token"
+        token_mock.refresh_token.assert_called_with(user)
 
 
 @pytest.fixture()

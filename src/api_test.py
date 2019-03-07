@@ -100,7 +100,7 @@ def test_follow(follow, client):
 
 @mock.patch("src.api.users.login")
 def test_login(login_mock, client):
-    login_mock.return_value = Credentials("secret_token")
+    login_mock.return_value = Credentials("secret_token", "refresh_token")
 
     response = client \
         .post("/login", json={"login": "john", "password": "secret"}) \
@@ -108,8 +108,20 @@ def test_login(login_mock, client):
 
     login_mock.assert_called_with("john", "secret")
     assert response == {
-        "token": "secret_token"
+        "token": "secret_token",
+        "refresh_token": "refresh_token"
     }
+
+
+@mock.patch("src.api.get_raw_jwt")
+@mock.patch("src.api.tokens")
+def test_logout(tokens_mock, get_raw_jwt_mock, client):
+    get_raw_jwt_mock.return_value = {"jti": "some jti"}
+
+    response = client.post("/logout")
+
+    assert response.status_code == 204
+    tokens_mock.revoke.assert_called_with("some jti")
 
 
 @mock.patch("src.api.users.login")

@@ -4,12 +4,15 @@ from sqlalchemy.orm.exc import NoResultFound
 from src.infrastructure import init_extensions
 from src import users, tweets
 from src.config import configuration
-from flask_jwt_extended import jwt_required
+from src import tokens
+from flask_jwt_extended import jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = configuration.get("database", "url")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = configuration.get("database", "tack_modifications")
-app.config['JWT_SECRET_KEY'] = 'secret123'
+app.config['JWT_SECRET_KEY'] = configuration.get("jwt", "secret")
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 init_extensions(app)
 Message = namedtuple("Message", "from_, message")
 
@@ -36,10 +39,18 @@ def login_user():
         return jsonify({"message": "Invalid credentials"}), 401
 
 
-@app.route("/secured")
+@jwt_refresh_token_required
+@app.route("/login/refresh", methods=["POST"])
+def refresh_token():
+    user = get_jwt_identity()
+    return jsonify(tokens.refresh_token(user)._asdict())
+
+
 @jwt_required
-def secured_api():
-    return jsonify({"message": 42}), 200
+@app.route("/logout", methods=["POST"])
+def logout():
+    tokens.revoke(get_raw_jwt()['jti'])
+    return '', 204
 
 
 @app.route("/users/<login>/tweets", methods=["POST"])
@@ -66,3 +77,8 @@ def add_follower(login):
 @app.errorhandler(NoResultFound)
 def no_result_found_handler(error):
     return jsonify(message="not found", err=str(error)), 404
+
+
+@app.errorhandler(Exception)
+def any_error_handler(error):
+    return jsonify(message="not found", err=str(error)), 500
