@@ -1,8 +1,21 @@
 from collections import namedtuple
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from src import db, infrastructure
+from functools import wraps
 
 Credentials = namedtuple("Credentials", "token, refresh_token")
+
+
+def guarantee_identity(f):
+    @wraps(f)
+    def check(*args, **kwargs):
+        login = kwargs["login"]
+        user = get_jwt_identity()
+        if user.get("name") != login:
+            raise SecurityException()
+        return f(*args, **kwargs)
+
+    return check
 
 
 def refresh_token(user):
@@ -26,7 +39,9 @@ def _generate_refresh_token(user):
 
 def _create_identity(user):
     return {
-        "user": {
-            "name": user.name
-        }
+        "name": user.name
     }
+
+
+class SecurityException(Exception):
+    pass

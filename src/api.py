@@ -54,6 +54,7 @@ def logout():
 
 
 @app.route("/users/<login>/tweets", methods=["POST"])
+@tokens.guarantee_identity
 def create_tweet(login):
     payload = request.get_json()
     tweet = tweets.create_tweet(login, payload.get("content"))
@@ -77,6 +78,11 @@ def add_follower(login):
 @app.errorhandler(NoResultFound)
 def no_result_found_handler(error):
     return jsonify(message="not found", err=str(error)), 404
+
+
+@app.errorhandler(tokens.SecurityException)
+def security_exception_handler(error):
+    return jsonify(message="Forbidden"), 403
 
 
 @app.errorhandler(Exception)
