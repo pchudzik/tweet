@@ -18,6 +18,15 @@ def guarantee_identity(f):
     return check
 
 
+def inject_identity(fn):
+    @wraps(fn)
+    def do_inject(*args, **kwargs):
+        kwargs["user"] = UserIdentity(get_jwt_identity())
+        return fn(*args, **kwargs)
+
+    return do_inject
+
+
 def refresh_token(user):
     return Credentials(
         _generate_token(user),
@@ -41,6 +50,11 @@ def _create_identity(user):
     return {
         "name": user.name
     }
+
+
+class UserIdentity:
+    def __init__(self, jwt_token):
+        self.name = jwt_token.get("name")
 
 
 class SecurityException(Exception):

@@ -68,10 +68,15 @@ def find_all_tweets(login):
 
 
 @app.route("/users/<login>/followers", methods=["PATCH"])
-def add_follower(login):
+@tokens.inject_identity
+def add_follower(login, user):
     payload = request.get_json()
     follower = payload.get("follower")
-    user = payload.get("user")
+    user = payload.get("user") if user.name == login and login==payload.get("user") else ""
+
+    if not user:
+        raise tokens.SecurityException()
+
     return jsonify(users.follow(follower, user)._asdict())
 
 
