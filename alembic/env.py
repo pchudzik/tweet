@@ -11,8 +11,8 @@ import os, sys
 
 sys.path.append(os.getcwd())
 
-from src.infrastructure import db as Base
-from src.config import configuration as app_cfg
+from twit.infrastructure import db as Base
+from twit.config import configuration as app_cfg
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

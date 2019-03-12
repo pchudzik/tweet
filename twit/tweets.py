@@ -1,6 +1,6 @@
 from collections import namedtuple
-from src import db
-from src.infrastructure import session as sql_session
+from twit import db
+from twit.infrastructure import session as sql_session
 
 Tweet = namedtuple("Tweet", "id user content")
 

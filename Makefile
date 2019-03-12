@@ -1,8 +1,8 @@
 ENV := DEV
 postgres_version = 11.1
-postgres_password = $(shell ENV=$(ENV) pipenv run python src/config.py database password)
-database_host = $(shell ENV=$(ENV) pipenv run python src/config.py database host)
-database_port = $(shell ENV=$(ENV) pipenv run python src/config.py database port)
+postgres_password = $(shell ENV=$(ENV) pipenv run python twit/config.py database password)
+database_host = $(shell ENV=$(ENV) pipenv run python twit/config.py database host)
+database_port = $(shell ENV=$(ENV) pipenv run python twit/config.py database port)
 dbmate_version = v1.4.1
 
 install:

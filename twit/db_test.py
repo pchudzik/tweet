@@ -2,11 +2,11 @@ import pytest
 from flask_testing import TestCase
 from flask import Flask
 from sqlalchemy.orm.exc import NoResultFound
-from src.config import configuration
-from src.infrastructure import init_extensions, session as sql_session
+from twit.config import configuration
+from twit.infrastructure import init_extensions, session as sql_session
 
-from src.db import User, Tweet, Follower, Token
-from src.db import find_user, find_tweets, find_followers, login, is_token_revoked
+from twit.db import User, Tweet, Follower, Token
+from twit.db import find_user, find_tweets, find_followers, login, is_token_revoked
 
 
 class DbTest(TestCase):

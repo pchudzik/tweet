@@ -1,12 +1,12 @@
 from unittest import mock
 import pytest
-import src.db as db
-from src import users
-from src.tokens import Credentials
-from src.FiledMatcher import FieldMatcher
+import twit.db as db
+from twit import users
+from twit.tokens import Credentials
+from twit.FiledMatcher import FieldMatcher
 
 
-@mock.patch("src.users.sql_session")
+@mock.patch("twit.users.sql_session")
 def test_create_user(sql_session_mock, session_mock):
     sql_session_mock.return_value.__enter__.return_value = session_mock
 
@@ -17,10 +17,10 @@ def test_create_user(sql_session_mock, session_mock):
         password="password"))
 
 
-@mock.patch("src.users.sql_session")
+@mock.patch("twit.users.sql_session")
 def test_find_user(sql_session_mock, session_mock):
     sql_session_mock.return_value.__enter__.return_value = session_mock
-    with mock.patch('src.db.find_user') as find_user:
+    with mock.patch('twit.db.find_user') as find_user:
         find_user.side_effect = [db.User("name", "password", id_value=1)]
 
         found = users.find_user("user login")
@@ -30,14 +30,14 @@ def test_find_user(sql_session_mock, session_mock):
         assert found.password == "password"
 
 
-@mock.patch("src.users.sql_session")
+@mock.patch("twit.users.sql_session")
 def test_follow(sql_session_mock, session_mock):
     sql_session_mock.return_value.__enter__.return_value = session_mock
 
     john_user = db.User("john", "secret", id_value=1)
     adam_user = db.User("adam", "secret", id_value=2)
 
-    with mock.patch('src.users.db.find_user') as find_user:
+    with mock.patch('twit.users.db.find_user') as find_user:
         find_user.side_effect = mock_find_user_to_find((john_user, adam_user))
 
         follower = users.follow("adam", "john")
@@ -50,11 +50,11 @@ def test_follow(sql_session_mock, session_mock):
         ))
 
 
-@mock.patch("src.users.sql_session")
-@mock.patch("src.users.tokens")
+@mock.patch("twit.users.sql_session")
+@mock.patch("twit.users.tokens")
 def test_login_user(token_mock, sql_session_mock, session_mock):
     sql_session_mock.return_value.__enter__.return_value = session_mock
-    with mock.patch("src.users.db.login") as login_user:
+    with mock.patch("twit.users.db.login") as login_user:
         user = db.User("john", "secret", id_value=1)
         login_user.return_value = user
         token_mock.refresh_token.return_value = Credentials(

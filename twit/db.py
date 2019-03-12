@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy.types import DateTime
 from sqlalchemy.orm import relationship
 
-from src.infrastructure import db
+from twit.infrastructure import db
 
 
 class User(db.Model):

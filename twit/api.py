@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
 from collections import namedtuple
 from sqlalchemy.orm.exc import NoResultFound
-from src.infrastructure import init_extensions
-from src import users, tweets
-from src.config import configuration
-from src import tokens
+from twit.infrastructure import init_extensions
+from twit import users, tweets
+from twit.config import configuration
+from twit import tokens
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt
 
 app = Flask(__name__)

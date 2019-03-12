@@ -3,12 +3,12 @@ from unittest import mock
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from src.api import app
-from src.users import User, Follower, Credentials
-from src.tweets import Tweet
+from twit.api import app
+from twit.users import User, Follower, Credentials
+from twit.tweets import Tweet
 
 
-@mock.patch("src.users.create_user")
+@mock.patch("twit.users.create_user")
 def test_create_user(create_user, client):
     create_user.return_value = User(123, "created", "secret")
 
@@ -25,7 +25,7 @@ def test_create_user(create_user, client):
     create_user.assert_called_once_with("name", "password")
 
 
-@mock.patch("src.users.find_user")
+@mock.patch("twit.users.find_user")
 def test_find_user(find_user, client):
     find_user.return_value = User(123, "name", "secret")
 
@@ -40,7 +40,7 @@ def test_find_user(find_user, client):
     }
 
 
-@mock.patch("src.tweets.create_tweet")
+@mock.patch("twit.tweets.create_tweet")
 def test_create_tweet(create_tweet, client, jwt_mock):
     stub_user(jwt_mock, "john")
     login = "john"
@@ -58,7 +58,7 @@ def test_create_tweet(create_tweet, client, jwt_mock):
     }
 
 
-@mock.patch("src.tweets.create_tweet")
+@mock.patch("twit.tweets.create_tweet")
 def test_raises_execption_when_creating_tweet_as_other_user(create_tweet, client, jwt_mock):
     stub_user(jwt_mock, "adam")
 
@@ -68,7 +68,7 @@ def test_raises_execption_when_creating_tweet_as_other_user(create_tweet, client
     assert response.status_code == 403
 
 
-@mock.patch("src.tweets.find_tweets")
+@mock.patch("twit.tweets.find_tweets")
 def test_find_tweet(find_tweets, client):
     login = "john"
     content = "content"
@@ -91,7 +91,7 @@ def test_find_tweet(find_tweets, client):
     }]
 
 
-@mock.patch("src.api.users.follow")
+@mock.patch("twit.api.users.follow")
 def test_follow(follow, jwt_mock, client):
     stub_user(jwt_mock, "john")
     john_user = User(1, "john", "secret1")
@@ -110,7 +110,7 @@ def test_follow(follow, jwt_mock, client):
     }
 
 
-@mock.patch("src.api.users.follow")
+@mock.patch("twit.api.users.follow")
 def test_raises_security_exception_when_following_invalid_user(follow, jwt_mock, client):
     stub_user(jwt_mock, "mark")
     john_user = User(1, "john", "secret1")
@@ -124,7 +124,7 @@ def test_raises_security_exception_when_following_invalid_user(follow, jwt_mock,
     assert response.status_code == 403
 
 
-@mock.patch("src.api.users.login")
+@mock.patch("twit.api.users.login")
 def test_login(login_mock, client):
     login_mock.return_value = Credentials("secret_token", "refresh_token")
 
@@ -139,8 +139,8 @@ def test_login(login_mock, client):
     }
 
 
-@mock.patch("src.api.get_raw_jwt")
-@mock.patch("src.api.tokens")
+@mock.patch("twit.api.get_raw_jwt")
+@mock.patch("twit.api.tokens")
 def test_logout(tokens_mock, get_raw_jwt_mock, client):
     get_raw_jwt_mock.return_value = {"jti": "some jti"}
 
@@ -150,7 +150,7 @@ def test_logout(tokens_mock, get_raw_jwt_mock, client):
     tokens_mock.revoke.assert_called_with("some jti")
 
 
-@mock.patch("src.api.users.login")
+@mock.patch("twit.api.users.login")
 def test_invalid_login(login_mock, client):
     login_mock.return_value = None
 
@@ -163,7 +163,7 @@ def test_invalid_login(login_mock, client):
     }
 
 
-@mock.patch("src.users.find_user")
+@mock.patch("twit.users.find_user")
 def test_NoResultFound_error_handler(find_user, client):
     find_user.side_effect = NoResultFound()
 
@@ -184,7 +184,7 @@ def client():
 
 @pytest.fixture()
 def jwt_mock():
-    with mock.patch("src.api.tokens.get_jwt_identity") as jwt_identity:
+    with mock.patch("twit.api.tokens.get_jwt_identity") as jwt_identity:
         yield jwt_identity
 
 
