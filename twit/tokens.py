@@ -11,7 +11,7 @@ def guarantee_identity(f):
     def check(*args, **kwargs):
         login = kwargs["login"]
         user = get_jwt_identity()
-        if user.get("name") != login:
+        if user and user.get("name") != login:
             raise SecurityException()
         return f(*args, **kwargs)
 

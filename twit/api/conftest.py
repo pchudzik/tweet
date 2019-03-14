@@ -3,8 +3,14 @@ from unittest import mock
 import pytest
 
 from twit.api.app import app
+from twit.infrastructure import jwt
 from twit.tokens import refresh_token
 from twit.users import User
+
+
+@jwt.token_in_blacklist_loader
+def token_blacklist(*args):
+    return False
 
 
 @pytest.fixture(scope="module")

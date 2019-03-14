@@ -1,6 +1,6 @@
 from unittest import mock
 
-from twit.api.conftest import stub_user
+from twit.api.conftest import stub_user, token_header
 from twit.tweets import Tweet
 
 
@@ -12,7 +12,7 @@ def test_create_tweet(create_tweet, client, jwt_mock):
     create_tweet.return_value = Tweet(123, login, content)
 
     response = client \
-        .post(f"/users/{login}/tweets", json={"content": content}) \
+        .post(f"/users/{login}/tweets", json={"content": content}, headers=token_header(login)) \
         .get_json()
 
     assert response == {
@@ -27,7 +27,7 @@ def test_raises_execption_when_creating_tweet_as_other_user(create_tweet, client
     stub_user(jwt_mock, "adam")
 
     response = client \
-        .post("/users/other/tweets", json={"content": "any_content"})
+        .post("/users/other/tweets", json={"content": "any_content"}, headers=token_header("adam"))
 
     assert response.status_code == 403
 

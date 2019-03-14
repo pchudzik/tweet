@@ -1,9 +1,10 @@
 from flask import jsonify, request, Flask
-
+from flask_jwt_extended import jwt_required
 from twit import tokens
 from twit import tweets
 
 
+@jwt_required
 @tokens.guarantee_identity
 def create_tweet(login):
     payload = request.get_json()

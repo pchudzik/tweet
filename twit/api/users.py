@@ -1,6 +1,7 @@
 from flask import jsonify, request, Flask
-
+from flask_jwt_extended import jwt_required
 from twit import users
+from twit import tokens
 
 
 def add_user():
@@ -9,6 +10,8 @@ def add_user():
     return jsonify(user._asdict())
 
 
+@tokens.guarantee_identity
+@jwt_required
 def list_user(login):
     return jsonify(users.find_user(login)._asdict())
 

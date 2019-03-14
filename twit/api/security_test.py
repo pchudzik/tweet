@@ -1,13 +1,8 @@
 from unittest import mock
 
 from twit.api.conftest import token_header
-from twit.infrastructure import jwt
 from twit.tokens import Credentials
 
-
-@jwt.token_in_blacklist_loader
-def token_blacklist(*args):
-    return False
 
 
 @mock.patch("twit.api.security.get_raw_jwt")

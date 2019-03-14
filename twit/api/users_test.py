@@ -1,8 +1,6 @@
 from unittest import mock
 
-import pytest
-
-from twit.api.app import app
+from twit.api.conftest import token_header
 from twit.users import User
 
 
@@ -28,7 +26,7 @@ def test_find_user(find_user, client):
     find_user.return_value = User(123, "name", "secret")
 
     response = client \
-        .get("/users/name") \
+        .get("/users/name", headers=token_header("name")) \
         .get_json()
 
     assert response == {
