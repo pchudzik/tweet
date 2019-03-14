@@ -1,11 +1,8 @@
 from unittest import mock
 
-import pytest
-
-from twit.api.app import app
+from twit.api.conftest import token_header
 from twit.infrastructure import jwt
-from twit.tokens import refresh_token, Credentials
-from twit.users import User
+from twit.tokens import Credentials
 
 
 @jwt.token_in_blacklist_loader
@@ -49,19 +46,4 @@ def test_login(login_mock, client):
     assert response == {
         "token": "secret_token",
         "refresh_token": "refresh_token"
-    }
-
-
-@pytest.fixture()
-def client():
-    with app.test_client() as client:
-        yield client
-
-
-def token_header(user_login="any_user"):
-    user = User(1, user_login, "any password")
-    with app.test_request_context():
-        token = refresh_token(user).token
-    return {
-        "Authorization": f"Bearer {token}"
     }

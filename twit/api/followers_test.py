@@ -1,8 +1,6 @@
 from unittest import mock
 
-import pytest
-
-from twit.api.app import app
+from twit.api.conftest import stub_user
 from twit.users import User, Follower
 
 
@@ -37,21 +35,3 @@ def test_raises_security_exception_when_following_invalid_user(follow, jwt_mock,
                json={"user": john_user.name, "follower": adam_user.name})
 
     assert response.status_code == 403
-
-
-@pytest.fixture()
-def client():
-    with app.test_client() as client:
-        yield client
-
-
-@pytest.fixture()
-def jwt_mock():
-    with mock.patch("twit.api.security.tokens.get_jwt_identity") as jwt_identity:
-        yield jwt_identity
-
-
-def stub_user(identity, user):
-    identity.return_value = {
-        "name": user
-    }

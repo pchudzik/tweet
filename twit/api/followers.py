@@ -1,10 +1,12 @@
 from flask import jsonify, request, Flask
+from flask_jwt_extended import jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt
 
 from twit import tokens
 from twit import users
 
 
 @tokens.inject_identity
+# @jwt_required
 def add_follower(login, user):
     payload = request.get_json()
     follower = payload.get("follower")
@@ -14,6 +16,7 @@ def add_follower(login, user):
         raise tokens.SecurityException()
 
     return jsonify(users.follow(follower, user)._asdict())
+
 
 
 def init_followers_endpoints(app: Flask):

@@ -36,9 +36,3 @@ def test_find_user(find_user, client):
         "name": "name",
         "password": "secret"
     }
-
-
-@pytest.fixture()
-def client():
-    with app.test_client() as client:
-        yield client
