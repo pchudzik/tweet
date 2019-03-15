@@ -18,10 +18,13 @@ test:
 	pipenv run pytest -v -W ignore::DeprecationWarning -W ignore::UserWarning
 	make stop-test-db
 
+migrate-db:
+	pipenv run alembic upgrade head
+
 run-test-db:
 	docker run --name tweet-postgres-tests -e POSTGRES_PASSWORD=$(postgres_password) --rm -p 5432:5432 -d postgres:$(postgres_version)
 	./wait-for-postgres.sh tweet-postgres-tests postgres $(postgres_password) $(postgres_version)
-	pipenv run alembic upgrade head
+	make migrate-db
 
 stop-test-db:
 	docker stop tweet-postgres-tests
